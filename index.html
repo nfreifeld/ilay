@@ -1,0 +1,594 @@
+
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Agent Secret - המשימה בפריז</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Heebo:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root{--bg:#0a0e1a;--panel:#12172b;--primary:#00d4ff;--secondary:#7c3aed;--success:#10b981;--danger:#ef4444;--gold:#fbbf24;--text:#e2e8f0;--muted:#64748b;--glow:0 0 20px rgba(0,212,255,0.3)}
+        *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+        html{height:100%;overflow:hidden}
+        body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--text);height:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+        body::before{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,212,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.02) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+        .app{position:relative;z-index:1;max-width:480px;margin:0 auto;padding:10px 10px 80px}
+        /* Header - compact on mobile */
+        .header{background:linear-gradient(135deg,#1a1f3a,#0f1629);border:1px solid rgba(0,212,255,0.2);border-radius:14px;padding:14px;text-align:center;margin-bottom:10px}
+        .header h1{font-family:'Orbitron',monospace;font-size:1.2rem;color:var(--primary);text-shadow:0 0 10px rgba(0,212,255,0.5)}
+        .header .sub{color:var(--muted);font-size:0.75rem;margin-top:2px}
+        /* XP */
+        .xp-box{background:var(--panel);border:1px solid rgba(0,212,255,0.1);border-radius:10px;padding:10px 14px;margin-bottom:10px}
+        .xp-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+        .xp-badge{font-family:'Orbitron',monospace;font-size:0.65rem;background:linear-gradient(135deg,var(--secondary),#5b21b6);padding:3px 8px;border-radius:14px;color:white;font-weight:700}
+        .xp-text{font-size:0.7rem;color:var(--muted)}
+        .xp-outer{height:7px;background:#1e293b;border-radius:8px;overflow:hidden}
+        .xp-inner{height:100%;background:linear-gradient(90deg,var(--primary),var(--secondary));border-radius:8px;transition:width 0.8s cubic-bezier(0.4,0,0.2,1)}
+        /* Stats */
+        .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}
+        .st{background:var(--panel);border:1px solid rgba(0,212,255,0.08);border-radius:10px;padding:8px 4px;text-align:center}
+        .st .si{font-size:1.1rem}.st .sv{font-family:'Orbitron',monospace;font-size:1rem;color:var(--gold);font-weight:700}.st .sl{font-size:0.6rem;color:var(--muted)}
+        /* Nav - scrollable horizontal on mobile */
+        .nav-scroll{overflow-x:auto;margin-bottom:10px;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:4px}
+        .nav-scroll::-webkit-scrollbar{display:none}
+        .nav-row{display:flex;gap:6px;min-width:max-content;padding:2px}
+        .nav-btn{background:var(--panel);border:1px solid #2d3748;color:var(--text);padding:10px 14px;border-radius:10px;cursor:pointer;font-size:0.7rem;font-weight:700;font-family:'Heebo',sans-serif;transition:all 0.2s;text-align:center;white-space:nowrap;min-width:70px;flex-shrink:0}
+        .nav-btn:active{transform:scale(0.95)}
+        .nav-btn.active{background:linear-gradient(135deg,rgba(0,212,255,0.15),rgba(124,58,237,0.15));border-color:var(--primary);box-shadow:var(--glow)}
+        .nav-btn .ne{font-size:1.2rem;display:block;margin-bottom:2px}
+        .nav-btn.locked{opacity:0.4;pointer-events:none;border-style:dashed}
+        .nav-btn.locked .ne::after{content:'🔒';font-size:0.7rem;position:relative;top:-4px}
+        /* Main */
+        .main{background:var(--panel);border:1px solid rgba(0,212,255,0.1);border-radius:14px;padding:16px;min-height:250px}
+        .zt{font-family:'Orbitron',monospace;font-size:0.9rem;color:var(--primary);margin-bottom:3px}
+        .zd{font-size:0.75rem;color:var(--muted);margin-bottom:14px}
+        /* Word cards - big touch targets */
+        .wc{background:linear-gradient(135deg,#1a2340,#151d33);border:1px solid #2d3748;border-radius:12px;padding:16px 14px;margin-bottom:8px;display:flex;align-items:center;cursor:pointer;transition:all 0.15s;-webkit-user-select:none;user-select:none}
+        .wc:active{transform:scale(0.97);border-color:var(--primary)}
+        .wc .we{font-size:2rem;margin-left:12px;flex-shrink:0}
+        .wc .wi{flex:1;text-align:right}
+        .wc .wf{font-size:1.1rem;font-weight:700;color:var(--primary)}
+        .wc .wh{color:var(--text);font-size:0.9rem}
+        .wc .wp{color:var(--gold);font-size:0.75rem}
+        .wc .ws{font-size:1.4rem;opacity:0.5;flex-shrink:0}
+        /* Games */
+        .gsec{margin-top:18px;padding-top:18px;border-top:1px dashed #2d3748}
+        .gmodes{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+        .gm{background:linear-gradient(135deg,#1a2340,#0f1629);border:1px solid #2d3748;color:var(--text);padding:18px 10px;border-radius:12px;cursor:pointer;font-family:'Heebo',sans-serif;font-size:0.8rem;font-weight:700;text-align:center;transition:all 0.15s}
+        .gm:active{transform:scale(0.95);border-color:var(--primary)}
+        .gm .gi{font-size:1.6rem;display:block;margin-bottom:4px}
+        /* Memory grid */
+        .mgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:14px 0}
+        .mc{aspect-ratio:1;background:linear-gradient(135deg,#1a2340,#151d33);border:2px solid #2d3748;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;cursor:pointer;transition:all 0.2s;padding:4px;text-align:center;-webkit-user-select:none}
+        .mc:active{transform:scale(0.93)}
+        .mc.flipped{background:linear-gradient(135deg,#1e3a5f,#162d4d);border-color:var(--primary);box-shadow:var(--glow)}
+        .mc.matched{background:linear-gradient(135deg,rgba(16,185,129,0.2),rgba(16,185,129,0.1));border-color:var(--success);animation:pop 0.4s}
+        @keyframes pop{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+        /* Quiz */
+        .qq{font-family:'Orbitron',monospace;font-size:1.6rem;text-align:center;color:var(--primary);margin:16px 0;text-shadow:0 0 8px rgba(0,212,255,0.3)}
+        .qopts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+        .qo{background:linear-gradient(135deg,#1a2340,#0f1629);border:2px solid #2d3748;color:var(--text);padding:18px 10px;border-radius:10px;cursor:pointer;font-size:1rem;font-weight:700;font-family:'Heebo',sans-serif;transition:all 0.15s;text-align:center;-webkit-user-select:none}
+        .qo:active{transform:scale(0.95)}
+        .qo.correct{border-color:var(--success)!important;background:rgba(16,185,129,0.15)!important;animation:pop 0.4s}
+        .qo.wrong{border-color:var(--danger)!important;background:rgba(239,68,68,0.15)!important;animation:shake 0.3s}
+        @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+        /* Timer */
+        .tbar{height:5px;background:#1e293b;border-radius:8px;margin:10px 0;overflow:hidden}
+        .tfill{height:100%;background:linear-gradient(90deg,var(--danger),var(--gold));border-radius:8px;transition:width 0.1s linear}
+        /* Listen btn */
+        .lbtn{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--secondary));border:none;font-size:2.2rem;cursor:pointer;display:block;margin:16px auto;box-shadow:0 0 30px rgba(0,212,255,0.3)}
+        .lbtn:active{transform:scale(0.9)}
+        /* Write input */
+        .winp{width:100%;background:#1a2340;border:2px solid #2d3748;color:var(--text);padding:16px;border-radius:10px;font-size:1.2rem;font-family:'Orbitron',monospace;text-align:center;outline:none;direction:ltr}
+        .winp:focus{border-color:var(--primary);box-shadow:var(--glow)}
+        /* Shop */
+        .sgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+        .sc{background:linear-gradient(135deg,#1a2340,#151d33);border:1px solid #2d3748;border-radius:12px;padding:14px;text-align:center;cursor:pointer;transition:all 0.15s}
+        .sc:active{transform:scale(0.95)}.sc.bought{opacity:0.5;border-color:var(--success)}
+        .sc .se{font-size:2.2rem}.sc .sn{font-size:0.75rem;margin:5px 0;font-weight:700}
+        .sc .sp{font-family:'Orbitron',monospace;font-size:0.7rem;color:var(--gold)}
+        /* Buttons */
+        .abtn{width:100%;padding:16px;border:none;border-radius:10px;font-size:1rem;font-weight:700;font-family:'Heebo',sans-serif;cursor:pointer;color:white;background:linear-gradient(135deg,var(--primary),var(--secondary))}
+        .abtn:active{transform:scale(0.97)}.abtn.green{background:linear-gradient(135deg,var(--success),#059669)}
+        .bbtn{background:transparent;border:1px solid #2d3748;color:var(--muted);padding:12px;border-radius:8px;width:100%;cursor:pointer;font-family:'Heebo',sans-serif;font-size:0.85rem;margin-top:8px}
+        .bbtn:active{border-color:var(--primary)}
+        /* Toast */
+        .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);background:var(--panel);border:1px solid var(--success);color:var(--text);padding:12px 20px;border-radius:10px;font-weight:700;z-index:1000;transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);box-shadow:0 10px 40px rgba(0,0,0,0.6);font-size:0.9rem;max-width:90vw;text-align:center}
+        .toast.show{transform:translateX(-50%) translateY(0)}
+        /* Particles */
+        .particle{position:fixed;pointer-events:none;font-size:1.5rem;z-index:999;animation:fly 1.3s ease-out forwards}
+        @keyframes fly{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-80px) scale(0.4)}}
+        .streak-flame{animation:flicker 0.5s infinite alternate}
+        @keyframes flicker{0%{transform:scale(1)}100%{transform:scale(1.15)}}
+        /* Results */
+        .rbox{text-align:center;padding:20px 10px}
+        .rscore{font-family:'Orbitron',monospace;font-size:2.8rem;color:var(--gold);text-shadow:0 0 15px rgba(251,191,36,0.4)}
+        .rstars{font-size:2rem;margin:8px 0}
+        /* Unlock banner */
+        .unlock-banner{background:linear-gradient(135deg,rgba(0,212,255,0.1),rgba(124,58,237,0.1));border:1px solid var(--primary);border-radius:12px;padding:16px;text-align:center;margin-bottom:12px;animation:pop 0.6s}
+        .unlock-banner .ub-title{font-family:'Orbitron',monospace;font-size:0.9rem;color:var(--primary)}
+        .unlock-banner .ub-desc{font-size:0.8rem;color:var(--muted);margin-top:4px}
+    </style>
+</head>
+<body>
+<div class="app">
+    <div class="header">
+        <h1>🕵️ AGENT SECRET</h1>
+        <div class="sub">המשימה הסודית בפריז - קיץ 2026</div>
+    </div>
+    <div class="xp-box">
+        <div class="xp-row"><span class="xp-badge" id="lvl-badge">דרגה 1</span><span class="xp-text"><span id="xp-cur">0</span>/<span id="xp-need">100</span> XP</span></div>
+        <div class="xp-outer"><div class="xp-inner" id="xp-bar" style="width:0%"></div></div>
+    </div>
+    <div class="stats">
+        <div class="st"><div class="si">₪</div><div class="sv" id="coins">0</div><div class="sl">שקלים</div></div>
+        <div class="st"><div class="si" id="si-streak">🔥</div><div class="sv" id="streak">0</div><div class="sl">רצף</div></div>
+        <div class="st"><div class="si">⭐</div><div class="sv" id="stars">0</div><div class="sl">כוכבים</div></div>
+    </div>
+    <div class="nav-scroll"><div class="nav-row" id="nav-row"></div></div>
+    <div class="main" id="main"></div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const zones = {
+    1: { name: "נחיתה בפריז", icon: "🛬", desc: "נימוסים וביטויים", unlock:1, items: [
+        {f:"Bonjour",h:"שלום",p:"בּוֹנז׳וּר",e:"👋"},{f:"Merci",h:"תודה",p:"מֶרְסִי",e:"🎁"},
+        {f:"S'il vous plaît",h:"בבקשה",p:"סִיל וּ פְּלֶה",e:"🙏"},{f:"Au revoir",h:"להתראות",p:"אוֹ רְבוּאָר",e:"✌️"},
+        {f:"Oui",h:"כן",p:"וִוי",e:"✅"},{f:"Non",h:"לא",p:"נוֹן",e:"❌"},
+        {f:"Comment ça va?",h:"מה שלומך?",p:"קוֹמוֹן סָה וָה?",e:"😊"},{f:"Très bien",h:"מצוין",p:"טְרֶה בְּיַן",e:"👍"},
+        {f:"Excusez-moi",h:"סליחה",p:"אֶקְסְקִיוּזֶה מוּאָה",e:"🙇"},{f:"Bonsoir",h:"ערב טוב",p:"בּוֹנְסוּאָר",e:"🌆"}
+    ]},
+    2: { name: "השוק והמאפייה", icon: "🥐", desc: "אוכל ושתייה", unlock:1, items: [
+        {f:"Chocolat",h:"שוקולד",p:"שׁוֹקוֹלָה",e:"🍫"},{f:"Croissant",h:"קרואסון",p:"קְרוּאָסוֹן",e:"🥐"},
+        {f:"Banane",h:"בננה",p:"בָּאנָאן",e:"🍌"},{f:"Eau",h:"מים",p:"אוֹ",e:"💧"},
+        {f:"Gâteau",h:"עוגה",p:"גָּאטוֹ",e:"🎂"},{f:"Glace",h:"גלידה",p:"גְלָאס",e:"🍦"},
+        {f:"Pain",h:"לחם",p:"פַּן",e:"🥖"},{f:"Fromage",h:"גבינה",p:"פְרוֹמָאז׳",e:"🧀"},
+        {f:"Pomme",h:"תפוח",p:"פּוֹם",e:"🍎"},{f:"Lait",h:"חלב",p:"לֶה",e:"🥛"}
+    ]},
+    3: { name: "גן החיות", icon: "🦁", desc: "חיות מכל העולם", unlock:2, items: [
+        {f:"Chat",h:"חתול",p:"שָׁה",e:"🐱"},{f:"Chien",h:"כלב",p:"שְׁיֶן",e:"🐶"},
+        {f:"Lion",h:"אריה",p:"לִיוֹן",e:"🦁"},{f:"Oiseau",h:"ציפור",p:"וּוָאזוֹ",e:"🐦"},
+        {f:"Poisson",h:"דג",p:"פּוּאָסוֹן",e:"🐟"},{f:"Papillon",h:"פרפר",p:"פָּאפִּיוֹן",e:"🦋"},
+        {f:"Cheval",h:"סוס",p:"שְׁבָאל",e:"🐴"},{f:"Lapin",h:"ארנב",p:"לָאפַּן",e:"🐰"},
+        {f:"Éléphant",h:"פיל",p:"אֶלֶפָאן",e:"🐘"},{f:"Grenouille",h:"צפרדע",p:"גְרְנוּי",e:"🐸"}
+    ]},
+    4: { name: "הבית והמשפחה", icon: "🏠", desc: "אנשים וחפצים בבית", unlock:2, items: [
+        {f:"Maison",h:"בית",p:"מֶזוֹן",e:"🏠"},{f:"Famille",h:"משפחה",p:"פָאמִיי",e:"👨‍👩‍👦"},
+        {f:"Papa",h:"אבא",p:"פָּאפָּא",e:"👨"},{f:"Maman",h:"אמא",p:"מָאמָא",e:"👩"},
+        {f:"Frère",h:"אח",p:"פְרֶר",e:"👦"},{f:"Sœur",h:"אחות",p:"סֶר",e:"👧"},
+        {f:"Livre",h:"ספר",p:"לִיבְר",e:"📚"},{f:"Lit",h:"מיטה",p:"לִי",e:"🛏️"},
+        {f:"Table",h:"שולחן",p:"טָאבְּל",e:"🪑"},{f:"Porte",h:"דלת",p:"פּוֹרְט",e:"🚪"}
+    ]},
+    5: { name: "חופשה וטבע", icon: "☀️", desc: "קיץ, חוף ומזג אוויר", unlock:3, items: [
+        {f:"Soleil",h:"שמש",p:"סוֹלֵיי",e:"☀️"},{f:"Plage",h:"חוף",p:"פְּלָאז׳",e:"🏖️"},
+        {f:"Mer",h:"ים",p:"מֶר",e:"🌊"},{f:"Chaud",h:"חם",p:"שׁוֹ",e:"🔥"},
+        {f:"Froid",h:"קר",p:"פְרוּאָה",e:"🥶"},{f:"Lune",h:"ירח",p:"לִין",e:"🌙"},
+        {f:"Étoile",h:"כוכב",p:"אֶטוּאָל",e:"⭐"},{f:"Arbre",h:"עץ",p:"אָרְבְּר",e:"🌳"},
+        {f:"Fleur",h:"פרח",p:"פְלֶר",e:"🌸"},{f:"Pluie",h:"גשם",p:"פְּלוּי",e:"🌧️"}
+    ]},
+    6: { name: "צבעים", icon: "🎨", desc: "כל הצבעים", unlock:3, items: [
+        {f:"Rouge",h:"אדום",p:"רוּז׳",e:"🔴"},{f:"Bleu",h:"כחול",p:"בְּלֶה",e:"🔵"},
+        {f:"Vert",h:"ירוק",p:"וֶר",e:"🟢"},{f:"Jaune",h:"צהוב",p:"ז׳וֹן",e:"🟡"},
+        {f:"Noir",h:"שחור",p:"נוּאָר",e:"⚫"},{f:"Blanc",h:"לבן",p:"בְּלָאן",e:"⚪"},
+        {f:"Orange",h:"כתום",p:"אוֹרָאנְז׳",e:"🟠"},{f:"Rose",h:"ורוד",p:"רוֹז",e:"🩷"},
+        {f:"Violet",h:"סגול",p:"וִיוֹלֶה",e:"🟣"},{f:"Marron",h:"חום",p:"מָארוֹן",e:"🟤"}
+    ]},
+    7: { name: "מספרים", icon: "🔢", desc: "לספור 1-10", unlock:4, items: [
+        {f:"Un",h:"אחד",p:"אָן",e:"1️⃣"},{f:"Deux",h:"שתיים",p:"דֶּה",e:"2️⃣"},
+        {f:"Trois",h:"שלוש",p:"טְרוּאָה",e:"3️⃣"},{f:"Quatre",h:"ארבע",p:"קָאטְר",e:"4️⃣"},
+        {f:"Cinq",h:"חמש",p:"סַנְק",e:"5️⃣"},{f:"Six",h:"שש",p:"סִיס",e:"6️⃣"},
+        {f:"Sept",h:"שבע",p:"סֶט",e:"7️⃣"},{f:"Huit",h:"שמונה",p:"אוּיִט",e:"8️⃣"},
+        {f:"Neuf",h:"תשע",p:"נֶף",e:"9️⃣"},{f:"Dix",h:"עשר",p:"דִיס",e:"🔟"}
+    ]},
+    8: { name: "הגוף", icon: "🫀", desc: "חלקי הגוף", unlock:5, items: [
+        {f:"Tête",h:"ראש",p:"טֶט",e:"🗣️"},{f:"Main",h:"יד",p:"מַן",e:"✋"},
+        {f:"Pied",h:"רגל",p:"פְּיֶה",e:"🦶"},{f:"Yeux",h:"עיניים",p:"יֶה",e:"👀"},
+        {f:"Bouche",h:"פה",p:"בּוּשׁ",e:"👄"},{f:"Nez",h:"אף",p:"נֶה",e:"👃"},
+        {f:"Oreille",h:"אוזן",p:"אוֹרֵיי",e:"👂"},{f:"Cœur",h:"לב",p:"קֶר",e:"❤️"},
+        {f:"Dos",h:"גב",p:"דוֹ",e:"🔙"},{f:"Ventre",h:"בטן",p:"וָאנְטְר",e:"🫃"}
+    ]},
+    9: { name: "בית הספר", icon: "🏫", desc: "חפצים ופעולות", unlock:6, items: [
+        {f:"École",h:"בית ספר",p:"אֶקוֹל",e:"🏫"},{f:"Crayon",h:"עיפרון",p:"קְרֶיוֹן",e:"✏️"},
+        {f:"Cahier",h:"מחברת",p:"קָאיֶה",e:"📓"},{f:"Professeur",h:"מורה",p:"פְּרוֹפֶסֶר",e:"👨‍🏫"},
+        {f:"Ami",h:"חבר",p:"אָמִי",e:"🤝"},{f:"Classe",h:"כיתה",p:"קְלָאס",e:"🪑"},
+        {f:"Jouer",h:"לשחק",p:"ז׳וּאֶה",e:"🎮"},{f:"Lire",h:"לקרוא",p:"לִיר",e:"📖"},
+        {f:"Écrire",h:"לכתוב",p:"אֶקְרִיר",e:"✍️"},{f:"Chanter",h:"לשיר",p:"שָׁאנְטֶה",e:"🎤"}
+    ]},
+    10: { name: "העיר והתחבורה", icon: "🚇", desc: "להסתובב בפריז", unlock:7, items: [
+        {f:"Voiture",h:"מכונית",p:"וּוָאטִיר",e:"🚗"},{f:"Train",h:"רכבת",p:"טְרַן",e:"🚆"},
+        {f:"Avion",h:"מטוס",p:"אָוְיוֹן",e:"✈️"},{f:"Vélo",h:"אופניים",p:"וֶלוֹ",e:"🚲"},
+        {f:"Rue",h:"רחוב",p:"רִיוּ",e:"🛣️"},{f:"Magasin",h:"חנות",p:"מָאגָאזַן",e:"🏪"},
+        {f:"Parc",h:"פארק",p:"פָּארְק",e:"🌳"},{f:"Métro",h:"מטרו",p:"מֶטְרוֹ",e:"🚇"},
+        {f:"Hôpital",h:"בית חולים",p:"אוֹפִּיטָאל",e:"🏥"},{f:"Police",h:"משטרה",p:"פּוֹלִיס",e:"🚔"}
+    ]}
+};
+
+const shopItems = [
+    {id:1,name:"כרטיס למגדל אייפל",cost:25,e:"🗼"},{id:2,name:"ברט צרפתי",cost:50,e:"🎨"},
+    {id:3,name:"מפתח הסוכן",cost:75,e:"🔑"},{id:4,name:"מטוס סודי",cost:120,e:"✈️"},
+    {id:5,name:"כף קסם",cost:100,e:"🪄"},{id:6,name:"מגן הסוכן",cost:150,e:"🛡️"},
+    {id:7,name:"משקפת לילה",cost:200,e:"🥽"},{id:8,name:"דרכון זהב",cost:300,e:"📒"}
+];
+const levels = [
+    {xp:0,name:"מתחיל",rank:1},{xp:100,name:"חניך",rank:2},{xp:250,name:"סוכן זוטר",rank:3},
+    {xp:500,name:"סוכן",rank:4},{xp:800,name:"סוכן בכיר",rank:5},{xp:1200,name:"מפקד",rank:6},
+    {xp:1800,name:"סוכן על",rank:7},{xp:2500,name:"אלוף פריז",rank:8}
+];
+const DAILY_PRIZE = 250;
+const DAILY_ROUNDS = 10;
+const GAMES_TO_UNLOCK = 3; // Games needed before daily challenge
+
+let state = JSON.parse(localStorage.getItem('agentFR5')||'null') || {
+    coins:0,xp:0,streak:0,stars:0,lastPlay:null,shopBought:[],unlockShown:[],
+    dailyDate:null,dailyDone:false,dailyBest:0,
+    todayGames:0,todayGamesDate:null
+};
+let currentZone = 1;
+
+function save(){localStorage.setItem('agentFR5',JSON.stringify(state));}
+function getLevel(){
+    let idx=0;
+    for(let i=levels.length-1;i>=0;i--){if(state.xp>=levels[i].xp){idx=i;break;}}
+    return{idx,data:levels[idx]};
+}
+function isZoneUnlocked(z){return getLevel().data.rank >= zones[z].unlock;}
+function getTodayGames(){
+    const today=new Date().toDateString();
+    if(state.todayGamesDate!==today){state.todayGames=0;state.todayGamesDate=today;save();}
+    return state.todayGames;
+}
+function addTodayGame(){
+    const today=new Date().toDateString();
+    if(state.todayGamesDate!==today){state.todayGames=0;state.todayGamesDate=today;}
+    state.todayGames++;save();
+    // Check if just unlocked daily
+    if(state.todayGames===GAMES_TO_UNLOCK && !state.dailyDone){
+        toast('🏆 האתגר היומי נפתח!');spawnParticles('🏆',5);
+    }
+    buildNav();
+}
+function isDailyReady(){
+    const today=new Date().toDateString();
+    if(state.dailyDate===today && state.dailyDone) return 'done';
+    if(getTodayGames()>=GAMES_TO_UNLOCK) return 'ready';
+    return 'locked';
+}
+function updateUI(){
+    document.getElementById('coins').textContent=state.coins;
+    document.getElementById('streak').textContent=state.streak;
+    document.getElementById('stars').textContent=state.stars;
+    document.getElementById('xp-cur').textContent=state.xp;
+    const lvl=getLevel();
+    const next=levels[Math.min(lvl.idx+1,levels.length-1)];
+    const inLvl=state.xp-lvl.data.xp;const needed=next.xp-lvl.data.xp||1;
+    document.getElementById('xp-need').textContent=next.xp;
+    document.getElementById('xp-bar').style.width=Math.min(100,(inLvl/needed)*100)+'%';
+    document.getElementById('lvl-badge').textContent=`דרגה ${lvl.data.rank} - ${lvl.data.name}`;
+    if(state.streak>=3)document.getElementById('si-streak').classList.add('streak-flame');
+    buildNav();
+}
+function addXP(n){
+    const oldRank=getLevel().data.rank;state.xp+=n;const newLvl=getLevel();
+    if(newLvl.data.rank>oldRank){toast('🎉 עלית לדרגה '+newLvl.data.rank+': '+newLvl.data.name+'!');spawnParticles('⭐',8);checkNewUnlocks(newLvl.data.rank);}
+    save();updateUI();
+}
+function checkNewUnlocks(rank){
+    Object.keys(zones).forEach(k=>{const z=zones[k];
+        if(z.unlock===rank&&!state.unlockShown.includes(parseInt(k))){state.unlockShown.push(parseInt(k));setTimeout(()=>showUnlockBanner(k,z),1500);}
+    });
+}
+function showUnlockBanner(k,z){
+    const b=document.createElement('div');b.className='unlock-banner';
+    b.innerHTML=`<div class="ub-title">🔓 מחוז חדש!</div><div class="ub-desc">${z.icon} ${z.name}</div>`;
+    b.style.cursor='pointer';b.onclick=()=>{b.remove();switchZone(parseInt(k));};
+    document.querySelector('.main').insertAdjacentElement('beforebegin',b);
+    spawnParticles('🔓',5);setTimeout(()=>{if(b.parentNode)b.remove();},5000);
+}
+function addCoins(n){state.coins+=n;save();updateUI();}
+function addStars(n){state.stars+=n;save();updateUI();}
+function speak(text){const u=new SpeechSynthesisUtterance(text);u.lang='fr-FR';u.rate=0.85;window.speechSynthesis.speak(u);}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+function spawnParticles(emoji,count){for(let i=0;i<count;i++){const p=document.createElement('div');p.className='particle';p.textContent=emoji;p.style.left=(Math.random()*80+10)+'%';p.style.top=(Math.random()*40+30)+'%';document.body.appendChild(p);setTimeout(()=>p.remove(),1300);}}
+function playSound(type){try{const ctx=new(window.AudioContext||window.webkitAudioContext)();const o=ctx.createOscillator();const g=ctx.createGain();o.connect(g);g.connect(ctx.destination);g.gain.value=0.07;if(type==='correct')o.frequency.value=880;else if(type==='wrong')o.frequency.value=220;else{o.frequency.value=600;g.gain.value=0.03;}o.start();o.stop(ctx.currentTime+0.12);}catch(e){}}
+function checkStreak(){const today=new Date().toDateString();if(state.lastPlay!==today){const y=new Date(Date.now()-86400000).toDateString();state.streak=(state.lastPlay===y)?state.streak+1:1;state.lastPlay=today;save();}}
+checkStreak();
+
+// === NAV with gated daily challenge ===
+function buildNav(){
+    const dailyStatus = isDailyReady(); // 'locked', 'ready', or 'done'
+    const gamesLeft = Math.max(0, GAMES_TO_UNLOCK - getTodayGames());
+    let dailyLabel, dailyStyle, dailyAction;
+    if(dailyStatus==='done'){
+        dailyLabel='✅ הושלם!';
+        dailyStyle='opacity:0.5;border-color:var(--success)';
+        dailyAction="toast('✅ סיימת! חזור מחר')";
+    } else if(dailyStatus==='ready'){
+        dailyLabel='🏆 אתגר יומי';
+        dailyStyle='background:linear-gradient(135deg,rgba(251,191,36,0.2),rgba(251,191,36,0.05));border-color:var(--gold);animation:pop 0.6s';
+        dailyAction='openDaily()';
+    } else {
+        dailyLabel='🔒 '+gamesLeft+' משחקים';
+        dailyStyle='opacity:0.6;border-style:dashed;border-color:var(--gold)';
+        dailyAction="toast('🎮 שחק עוד "+gamesLeft+" משחקים כדי לפתוח!')";
+    }
+    let html=`<button class="nav-btn" style="${dailyStyle}" onclick="${dailyAction}">
+        <span class="ne">${dailyStatus==='ready'?'🏆':dailyStatus==='done'?'✅':'🔒'}</span>${dailyLabel}
+    </button>`;
+    Object.keys(zones).forEach(k=>{
+        const z=zones[k];const unlocked=isZoneUnlocked(k);
+        html+=`<button class="nav-btn ${parseInt(k)===currentZone?'active':''} ${unlocked?'':'locked'}" id="nav-${k}" onclick="${unlocked?'switchZone('+k+')':'lockedMsg('+z.unlock+')'}">
+            <span class="ne">${z.icon}</span>${z.name}</button>`;
+    });
+    html+=`<button class="nav-btn" onclick="openShop()"><span class="ne">🛒</span>חנות</button>`;
+    document.getElementById('nav-row').innerHTML=html;
+}
+function lockedMsg(req){toast('🔒 נפתח בדרגה '+req);}
+function switchZone(z){
+    if(!isZoneUnlocked(z)){lockedMsg(zones[z].unlock);return;}
+    currentZone=z;buildNav();renderZone(z);
+}
+function renderZone(z){
+    const zone=zones[z];
+    let html=`<div class="zt">${zone.icon} ${zone.name}</div><div class="zd">${zone.desc}</div>`;
+    zone.items.forEach(item=>{
+        html+=`<div class="wc" onclick="speak('${item.f.replace(/'/g,"\\'")}');addCoins(1);spawnParticles('₪',1);">
+            <div class="we">${item.e}</div>
+            <div class="wi"><div class="wf">${item.f}</div><div class="wh">${item.h}</div><div class="wp">🗣️ ${item.p}</div></div>
+            <div class="ws">🔊</div></div>`;
+    });
+    html+=`<div class="gsec"><div class="zt">🎮 משחקים</div><div class="zd">סיים ${GAMES_TO_UNLOCK} משחקים לפתיחת האתגר היומי!</div>
+        <div class="gmodes">
+            <button class="gm" onclick="startQuiz(${z})"><span class="gi">⚡</span>חידון</button>
+            <button class="gm" onclick="startMemory(${z})"><span class="gi">🧠</span>זיכרון</button>
+            <button class="gm" onclick="startListening(${z})"><span class="gi">👂</span>הקשבה</button>
+            <button class="gm" onclick="startWriting(${z})"><span class="gi">✍️</span>כתיבה</button>
+        </div></div>`;
+    document.getElementById('main').innerHTML=html;
+}
+
+// === QUIZ ===
+let qD=[],qI=0,qS=0,qT=null,qTm=0;
+function startQuiz(z){qD=[...zones[z].items].sort(()=>Math.random()-0.5).slice(0,8);qI=0;qS=0;showQ();}
+function showQ(){
+    if(qI>=qD.length){endQ();return;}
+    const q=qD[qI];const all=Object.values(zones).flatMap(z=>z.items);
+    let opts=[q.h];while(opts.length<4){const r=all[Math.floor(Math.random()*all.length)].h;if(!opts.includes(r))opts.push(r);}
+    opts.sort(()=>Math.random()-0.5);qTm=100;
+    let html=`<div class="zt">⚡ חידון</div><div class="zd">${qI+1}/${qD.length}</div>
+        <div class="tbar"><div class="tfill" id="tf" style="width:100%"></div></div>
+        <div class="qq">${q.e} ${q.f}</div>
+        <div style="text-align:center;color:var(--muted);margin-bottom:10px;font-size:0.8rem">מה זה בעברית?</div>
+        <div class="qopts">`;
+    opts.forEach(o=>{html+=`<button class="qo" onclick="aQ(this,'${o.replace(/'/g,"\\'")}','${q.h.replace(/'/g,"\\'")}')">${o}</button>`;});
+    html+=`</div><button class="bbtn" onclick="switchZone(${currentZone})">🔙 חזור</button>`;
+    document.getElementById('main').innerHTML=html;speak(q.f);
+    clearInterval(qT);qT=setInterval(()=>{qTm-=2;const f=document.getElementById('tf');if(f)f.style.width=qTm+'%';if(qTm<=0){clearInterval(qT);qI++;showQ();}},200);
+}
+function aQ(btn,ch,cor){
+    clearInterval(qT);document.querySelectorAll('.qo').forEach(b=>b.style.pointerEvents='none');
+    if(ch===cor){btn.classList.add('correct');qS++;playSound('correct');addXP(10);addCoins(3);spawnParticles('✨',3);}
+    else{btn.classList.add('wrong');playSound('wrong');document.querySelectorAll('.qo').forEach(b=>{if(b.textContent===cor)b.classList.add('correct');});}
+    setTimeout(()=>{qI++;showQ();},1100);
+}
+function endQ(){
+    clearInterval(qT);addTodayGame();
+    const p=Math.round((qS/qD.length)*100);const s=p>=90?3:p>=60?2:p>0?1:0;addStars(s);
+    if(p===100){addXP(20);addCoins(10);toast('🏆 מושלם!');}
+    let html=`<div class="rbox"><div class="zt">⚡ סיום</div><div class="rscore">${qS}/${qD.length}</div>
+        <div class="rstars">${'⭐'.repeat(s)}${'☆'.repeat(3-s)}</div>
+        <div style="color:var(--muted);margin:8px 0;font-size:0.85rem">${p>=90?'מדהים!':p>=60?'יפה!':'נסה שוב!'}</div>
+        <button class="abtn" onclick="startQuiz(${currentZone})">🔄 שוב</button>
+        <button class="bbtn" onclick="switchZone(${currentZone})">🔙 חזור</button></div>`;
+    document.getElementById('main').innerHTML=html;
+}
+
+// === MEMORY ===
+let mC=[],m1=null,m2=null,mL=false,mM=0,mT=0;
+function startMemory(z){
+    const items=[...zones[z].items].sort(()=>Math.random()-0.5).slice(0,4);
+    mC=[];m1=null;m2=null;mL=false;mM=0;mT=items.length;
+    items.forEach(i=>{mC.push({id:i.f,text:i.f,type:'fr'});mC.push({id:i.f,text:i.h,type:'he'});});
+    mC.sort(()=>Math.random()-0.5);
+    let html=`<div class="zt">🧠 זיכרון</div><div class="zd">מצא זוגות</div><div class="mgrid">`;
+    mC.forEach((c,i)=>{html+=`<div class="mc" id="mc-${i}" onclick="fM(${i})">❓</div>`;});
+    html+=`</div><button class="bbtn" onclick="switchZone(${currentZone})">🔙 חזור</button>`;
+    document.getElementById('main').innerHTML=html;
+}
+function fM(i){
+    if(mL)return;const el=document.getElementById('mc-'+i);
+    if(el.classList.contains('flipped')||el.classList.contains('matched'))return;
+    const c=mC[i];el.textContent=c.text;el.classList.add('flipped');
+    if(c.type==='fr')speak(c.text);playSound('click');
+    if(!m1){m1={el,card:c};return;}
+    m2={el,card:c};mL=true;
+    if(m1.card.id===m2.card.id){
+        setTimeout(()=>{m1.el.classList.add('matched');m2.el.classList.add('matched');
+        mM++;addXP(8);addCoins(4);spawnParticles('🎯',2);playSound('correct');
+        m1=null;m2=null;mL=false;
+        if(mM>=mT){addTodayGame();setTimeout(()=>{toast('🏆 כל הזוגות!');addStars(1);addXP(15);switchZone(currentZone);},700);}},400);
+    }else{
+        setTimeout(()=>{m1.el.textContent='❓';m1.el.classList.remove('flipped');
+        m2.el.textContent='❓';m2.el.classList.remove('flipped');
+        m1=null;m2=null;mL=false;playSound('wrong');},800);
+    }
+}
+
+// === LISTENING ===
+let lD=[],lI=0,lS=0;
+function startListening(z){lD=[...zones[z].items].sort(()=>Math.random()-0.5).slice(0,6);lI=0;lS=0;showLQ();}
+function showLQ(){
+    if(lI>=lD.length){endL();return;}
+    const q=lD[lI];const all=Object.values(zones).flatMap(z=>z.items);
+    let opts=[q.h];while(opts.length<4){const r=all[Math.floor(Math.random()*all.length)].h;if(!opts.includes(r))opts.push(r);}
+    opts.sort(()=>Math.random()-0.5);
+    let html=`<div class="zt">👂 הקשבה</div><div class="zd">${lI+1}/${lD.length}</div>
+        <button class="lbtn" onclick="speak('${q.f.replace(/'/g,"\\'")}')">🔊</button>
+        <div style="text-align:center;color:var(--muted);margin-bottom:10px;font-size:0.75rem">לחץ לשמוע, בחר תרגום</div>
+        <div class="qopts">`;
+    opts.forEach(o=>{html+=`<button class="qo" onclick="aL(this,'${o.replace(/'/g,"\\'")}','${q.h.replace(/'/g,"\\'")}')">${o}</button>`;});
+    html+=`</div><button class="bbtn" onclick="switchZone(${currentZone})">🔙 חזור</button>`;
+    document.getElementById('main').innerHTML=html;setTimeout(()=>speak(q.f),300);
+}
+function aL(btn,ch,cor){
+    document.querySelectorAll('.qo').forEach(b=>b.style.pointerEvents='none');
+    if(ch===cor){btn.classList.add('correct');lS++;playSound('correct');addXP(12);addCoins(4);spawnParticles('👂',2);}
+    else{btn.classList.add('wrong');playSound('wrong');document.querySelectorAll('.qo').forEach(b=>{if(b.textContent===cor)b.classList.add('correct');});}
+    setTimeout(()=>{lI++;showLQ();},1100);
+}
+function endL(){
+    addTodayGame();
+    const s=lS>=6?3:lS>=4?2:lS>0?1:0;addStars(s);
+    let html=`<div class="rbox"><div class="zt">👂 סיום</div><div class="rscore">${lS}/${lD.length}</div>
+        <div class="rstars">${'⭐'.repeat(s)}${'☆'.repeat(3-s)}</div>
+        <button class="abtn" onclick="startListening(${currentZone})">🔄 שוב</button>
+        <button class="bbtn" onclick="switchZone(${currentZone})">🔙 חזור</button></div>`;
+    document.getElementById('main').innerHTML=html;
+}
+
+// === WRITING ===
+let wD=[],wI=0,wS=0;
+function startWriting(z){wD=[...zones[z].items].sort(()=>Math.random()-0.5).slice(0,6);wI=0;wS=0;showWQ();}
+function showWQ(){
+    if(wI>=wD.length){endW();return;}
+    const q=wD[wI];
+    let html=`<div class="zt">✍️ כתיבה</div><div class="zd">${wI+1}/${wD.length}</div>
+        <div style="text-align:center;margin:18px 0">
+            <div style="font-size:2.5rem">${q.e}</div>
+            <div style="font-size:1.2rem;margin-top:6px">${q.h}</div>
+            <div style="font-size:0.8rem;color:var(--gold);margin-top:4px">רמז: ${q.p}</div>
+        </div>
+        <input class="winp" id="winp" placeholder="כתוב בצרפתית..." autocomplete="off" autocapitalize="off" onkeydown="if(event.key==='Enter')chkW()">
+        <div style="margin-top:10px"><button class="abtn green" onclick="chkW()">בדוק ✓</button></div>
+        <button class="bbtn" onclick="switchZone(${currentZone})">🔙 חזור</button>`;
+    document.getElementById('main').innerHTML=html;setTimeout(()=>document.getElementById('winp').focus(),150);
+}
+function chkW(){
+    const inp=document.getElementById('winp').value.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+    const cor=wD[wI].f.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+    if(inp===cor){wS++;playSound('correct');addXP(15);addCoins(5);toast('✅ '+wD[wI].f);spawnParticles('🎉',3);}
+    else{playSound('wrong');toast('❌ '+wD[wI].f);}
+    setTimeout(()=>{wI++;showWQ();},1400);
+}
+function endW(){
+    addTodayGame();
+    const s=wS>=6?3:wS>=4?2:wS>0?1:0;addStars(s);
+    let html=`<div class="rbox"><div class="zt">✍️ סיום</div><div class="rscore">${wS}/${wD.length}</div>
+        <div class="rstars">${'⭐'.repeat(s)}${'☆'.repeat(3-s)}</div>
+        <button class="abtn" onclick="startWriting(${currentZone})">🔄 שוב</button>
+        <button class="bbtn" onclick="switchZone(${currentZone})">🔙 חזור</button></div>`;
+    document.getElementById('main').innerHTML=html;
+}
+
+// === DAILY CHALLENGE ===
+let dcData=[],dcIdx=0,dcScore=0,dcTypes=[];
+
+function openDaily(){
+    const status=isDailyReady();
+    if(status==='done'){toast('✅ סיימת היום!');return;}
+    if(status==='locked'){const left=GAMES_TO_UNLOCK-getTodayGames();toast('🎮 שחק עוד '+left+' משחקים!');return;}
+    const today=new Date().toDateString();
+    if(state.dailyDate!==today){state.dailyDate=today;state.dailyDone=false;save();}
+    let html=`<div style="text-align:center;padding:10px">
+        <div style="font-size:3rem;margin-bottom:10px">🏆</div>
+        <div class="zt">אתגר יומי</div>
+        <div class="zd">${DAILY_ROUNDS} שאלות מעורבבות מכל המחוזות!</div>
+        <div style="background:linear-gradient(135deg,rgba(251,191,36,0.1),rgba(251,191,36,0.05));border:1px solid var(--gold);border-radius:12px;padding:16px;margin:16px 0">
+            <div style="font-family:Orbitron;font-size:1.4rem;color:var(--gold)">₪${DAILY_PRIZE}</div>
+            <div style="font-size:0.75rem;color:var(--muted);margin-top:4px">פרס על ציון מושלם</div>
+        </div>
+        <div style="font-size:0.8rem;color:var(--muted);margin-bottom:16px">כל תשובה נכונה = ₪${Math.floor(DAILY_PRIZE/DAILY_ROUNDS)}</div>
+        <button class="abtn" onclick="startDC()">🚀 התחל אתגר!</button>
+        <button class="bbtn" onclick="switchZone(${currentZone})">🔙 חזור</button></div>`;
+    document.getElementById('main').innerHTML=html;
+}
+function startDC(){
+    let pool=[];Object.keys(zones).forEach(k=>{if(isZoneUnlocked(k))pool.push(...zones[k].items);});
+    pool.sort(()=>Math.random()-0.5);dcData=pool.slice(0,DAILY_ROUNDS);dcIdx=0;dcScore=0;
+    dcTypes=dcData.map(()=>{const r=Math.random();return r<0.4?'quiz':r<0.7?'listen':'write';});
+    showDCQ();
+}
+function showDCQ(){
+    if(dcIdx>=dcData.length){endDC();return;}
+    const type=dcTypes[dcIdx];
+    if(type==='write'){showDCW();return;}
+    const q=dcData[dcIdx];const all=Object.values(zones).flatMap(z=>z.items);
+    let opts=[q.h];while(opts.length<4){const r=all[Math.floor(Math.random()*all.length)].h;if(!opts.includes(r))opts.push(r);}
+    opts.sort(()=>Math.random()-0.5);
+    const isListen=type==='listen';
+    let html=`<div class="zt">🏆 אתגר יומי</div>
+        <div class="zd">${dcIdx+1}/${DAILY_ROUNDS} • ${isListen?'👂 הקשבה':'⚡ חידון'}</div>
+        <div style="height:4px;background:#1e293b;border-radius:4px;margin:8px 0"><div style="height:100%;width:${(dcIdx/DAILY_ROUNDS)*100}%;background:linear-gradient(90deg,var(--gold),#f59e0b);border-radius:4px"></div></div>`;
+    if(isListen){html+=`<button class="lbtn" onclick="speak('${q.f.replace(/'/g,"\\'")}')">🔊</button><div style="text-align:center;color:var(--muted);margin-bottom:10px;font-size:0.75rem">הקשב ובחר</div>`;}
+    else{html+=`<div class="qq">${q.e} ${q.f}</div>`;}
+    html+=`<div class="qopts">`;
+    opts.forEach(o=>{html+=`<button class="qo" onclick="aDC(this,'${o.replace(/'/g,"\\'")}','${q.h.replace(/'/g,"\\'")}')">${o}</button>`;});
+    html+=`</div>`;
+    document.getElementById('main').innerHTML=html;
+    if(isListen)setTimeout(()=>speak(q.f),300);else speak(q.f);
+}
+function showDCW(){
+    const q=dcData[dcIdx];
+    let html=`<div class="zt">🏆 אתגר יומי</div>
+        <div class="zd">${dcIdx+1}/${DAILY_ROUNDS} • ✍️ כתיבה</div>
+        <div style="height:4px;background:#1e293b;border-radius:4px;margin:8px 0"><div style="height:100%;width:${(dcIdx/DAILY_ROUNDS)*100}%;background:linear-gradient(90deg,var(--gold),#f59e0b);border-radius:4px"></div></div>
+        <div style="text-align:center;margin:18px 0"><div style="font-size:2.5rem">${q.e}</div><div style="font-size:1.2rem;margin-top:6px">${q.h}</div><div style="font-size:0.8rem;color:var(--gold);margin-top:4px">רמז: ${q.p}</div></div>
+        <input class="winp" id="dcinp" placeholder="כתוב בצרפתית..." autocomplete="off" autocapitalize="off" onkeydown="if(event.key==='Enter')aDCW()">
+        <div style="margin-top:10px"><button class="abtn green" onclick="aDCW()">בדוק ✓</button></div>`;
+    document.getElementById('main').innerHTML=html;setTimeout(()=>document.getElementById('dcinp').focus(),150);
+}
+function aDC(btn,ch,cor){
+    document.querySelectorAll('.qo').forEach(b=>b.style.pointerEvents='none');
+    if(ch===cor){btn.classList.add('correct');dcScore++;playSound('correct');spawnParticles('💰',2);}
+    else{btn.classList.add('wrong');playSound('wrong');document.querySelectorAll('.qo').forEach(b=>{if(b.textContent===cor)b.classList.add('correct');});}
+    setTimeout(()=>{dcIdx++;showDCQ();},1100);
+}
+function aDCW(){
+    const inp=document.getElementById('dcinp').value.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+    const cor=dcData[dcIdx].f.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+    if(inp===cor){dcScore++;playSound('correct');toast('✅ '+dcData[dcIdx].f);spawnParticles('💰',2);}
+    else{playSound('wrong');toast('❌ '+dcData[dcIdx].f);}
+    setTimeout(()=>{dcIdx++;showDCQ();},1300);
+}
+function endDC(){
+    state.dailyDone=true;save();
+    const perQ=Math.floor(DAILY_PRIZE/DAILY_ROUNDS);
+    let prize=dcScore*perQ;const perfect=dcScore===DAILY_ROUNDS;
+    if(perfect)prize=DAILY_PRIZE;
+    addCoins(prize);addXP(dcScore*12);
+    if(perfect){addStars(5);spawnParticles('🏆',10);}else addStars(Math.ceil(dcScore/3));
+    if(dcScore>state.dailyBest){state.dailyBest=dcScore;save();}
+    let html=`<div class="rbox">
+        <div style="font-size:3rem;margin-bottom:8px">${perfect?'🏆':'🎯'}</div>
+        <div class="zt">אתגר יומי - סיום!</div><div class="rscore">${dcScore}/${DAILY_ROUNDS}</div>
+        <div class="rstars" style="margin:8px 0">${'⭐'.repeat(Math.min(5,Math.ceil(dcScore/2)))}${'☆'.repeat(5-Math.min(5,Math.ceil(dcScore/2)))}</div>
+        <div style="background:linear-gradient(135deg,rgba(251,191,36,0.1),rgba(251,191,36,0.05));border:1px solid var(--gold);border-radius:10px;padding:14px;margin:12px 0">
+            <div style="font-size:0.8rem;color:var(--muted)">הרווחת</div>
+            <div style="font-family:Orbitron;font-size:1.8rem;color:var(--gold)">₪${prize}</div>
+            ${perfect?'<div style="color:var(--success);font-size:0.8rem;margin-top:4px">🎉 בונוס מושלם!</div>':''}
+        </div>
+        <div style="font-size:0.75rem;color:var(--muted)">שיא: ${state.dailyBest}/${DAILY_ROUNDS}</div>
+        <button class="abtn" style="margin-top:14px" onclick="switchZone(${currentZone})">👍 המשך</button></div>`;
+    document.getElementById('main').innerHTML=html;buildNav();
+}
+
+// === SHOP ===
+function openShop(){
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+    let html=`<div class="zt">🛒 חנות</div><div class="zd">קנה ציוד סודי!</div>
+        <div style="text-align:center;margin:8px 0;color:var(--gold);font-family:Orbitron;font-size:1.2rem">₪${state.coins}</div><div class="sgrid">`;
+    shopItems.forEach(item=>{const bought=state.shopBought.includes(item.id);
+        html+=`<div class="sc ${bought?'bought':''}" onclick="buyItem(${item.id})"><div class="se">${item.e}</div><div class="sn">${item.name}</div><div class="sp">${bought?'✅':'₪'+item.cost}</div></div>`;});
+    html+=`</div><button class="bbtn" onclick="switchZone(${currentZone})">🔙 חזור</button>`;
+    document.getElementById('main').innerHTML=html;
+}
+function buyItem(id){
+    if(state.shopBought.includes(id))return;const item=shopItems.find(i=>i.id===id);
+    if(state.coins>=item.cost){state.coins-=item.cost;state.shopBought.push(id);save();updateUI();toast('🎉 '+item.name);spawnParticles(item.e,5);openShop();}
+    else toast('❌ אין מספיק ₪!');
+}
+
+// === INIT ===
+updateUI();switchZone(1);
+</script></body></html>
